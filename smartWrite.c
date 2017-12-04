@@ -19,19 +19,19 @@ int main()
     }
 
     int res;
-    res = ftruncate( memFd, 512 * sizeof(char) * GEN_BLOCK_SIZE );
+    res = ftruncate( memFd, 512 * sizeof(struct smart_block));
     if( res == -1 )
     {
         perror("Can't truncate file");
         return res;
     }   
-    char* mem = mmap( NULL, 512 * sizeof(char) * GEN_BLOCK_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, memFd, 0 );
+    struct smart_block* mem = mmap( NULL, 512 * sizeof(struct smart_block), PROT_READ | PROT_WRITE, MAP_SHARED, memFd, 0 );
     if( mem == NULL )
     {
         perror("Can't mmap");
         return -1;
     }
-    char* mem_begin = mem;
+    struct smart_block* mem_begin = mem;
      
     char str[4] = "lol";
     unsigned int seed = 1;
@@ -40,15 +40,15 @@ int main()
         char tmp[GEN_BLOCK_SIZE];
         strcpy(tmp, str);
         generate(tmp, seed);
-        memcpy(mem, tmp, strlen(tmp));
+        
+        strcpy(mem->gen_buff, tmp);
+        strcpy(mem->buff, str);
         seed += 1; 
         
-        if(mem + GEN_BLOCK_SIZE >= mem_begin + (512 * GEN_BLOCK_SIZE)){
+        if(mem + 1 >= mem_begin + 512){
             mem = mem_begin;
         }else{
-            verify(tmp);
-            printf("%s\n", tmp);
-            mem += GEN_BLOCK_SIZE;
+            mem += 1;
         }
     }   
 

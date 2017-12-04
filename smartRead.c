@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "gen.h"
+#include "smartBlock.h"
 
 int main()
 {
@@ -16,36 +17,37 @@ int main()
         return 1;
     }
 
-    char* mem = mmap( NULL, 512 * sizeof(char) * GEN_BLOCK_SIZE, PROT_READ, MAP_SHARED, memFd, 0 );
+    struct smart_block* mem = mmap( NULL, 512 * sizeof(struct smart_block), PROT_READ, MAP_SHARED, memFd, 0 );
     if( mem == NULL )
     {
         perror("Can't mmap");
         return -1;
     }   
-    char *mem_begin = mem;
+    struct smart_block* mem_begin = mem;
     char tmp[GEN_BLOCK_SIZE];
-    strcpy(tmp, mem);
+    strcpy(tmp, mem->gen_buff);
     int prev_seed = verify(tmp);
-    printf("%s\n", mem);
-    mem += GEN_BLOCK_SIZE;
+    printf("%s\n", mem->buff);
+    mem += 1;
     while( true )
     {
-        strcpy(tmp, mem);
+        strcpy(tmp, mem->gen_buff);
         int cur_seed = verify(tmp);
         if(cur_seed == prev_seed + 1)
         {
             prev_seed = cur_seed;
-            printf("%s\n", mem);
+            printf("%s\n", mem->buff);
             
         }else{
+            printf("Prev: %d Curr: %d\n", prev_seed, cur_seed);
             sleep(1);
-            mem -= GEN_BLOCK_SIZE;
-            continue;   
+            mem -= 1;
+            continue;              
         }
-        if(mem + GEN_BLOCK_SIZE == mem_begin + (512 * GEN_BLOCK_SIZE)){
+        if(mem + 1 >= mem_begin + 512){
             mem = mem_begin;
         }else{
-            mem += GEN_BLOCK_SIZE;
+            mem += 1;
         }
     }
 

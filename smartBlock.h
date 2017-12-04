@@ -4,8 +4,8 @@
 #include "gen.h"
 
 struct smart_block{
-    volatile unsigned int seed;
-    volatile char buff[GEN_BLOCK_SIZE];
+    char gen_buff[GEN_BLOCK_SIZE];
+    char buff[GEN_BLOCK_SIZE];
 };
 
 #endif
