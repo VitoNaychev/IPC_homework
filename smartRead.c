@@ -17,38 +17,33 @@ int main()
         return 1;
     }
 
-    struct smart_block* mem = mmap( NULL, 512 * sizeof(struct smart_block), PROT_READ, MAP_SHARED, memFd, 0 );
+    struct smart_block* mem = mmap( NULL, sizeof(struct smart_block), PROT_READ, MAP_SHARED, memFd, 0 );
     if( mem == NULL )
     {
         perror("Can't mmap");
         return -1;
     }   
     struct smart_block* mem_begin = mem;
-    char tmp[GEN_BLOCK_SIZE];
-    strcpy(tmp, mem->gen_buff);
-    int prev_seed = verify(tmp);
-    printf("%s\n", mem->buff);
-    mem += 1;
+    int i = 0; 
+    uint32_t prev_seed = verify((void*)(mem->gen + i));
+    ++ i;
     while( true )
     {
-        strcpy(tmp, mem->gen_buff);
-        int cur_seed = verify(tmp);
+        uint32_t cur_seed = verify((void*)(mem->gen + i));
+
         if(cur_seed == prev_seed + 1)
         {
             prev_seed = cur_seed;
-            printf("%s\n", mem->buff);
-            
+            printf("Penis\n"); 
         }else{
             printf("Prev: %d Curr: %d\n", prev_seed, cur_seed);
-            sleep(1);
-            mem -= 1;
+            usleep(1);
+            -- i;
+            i %= 512;
             continue;              
         }
-        if(mem + 1 >= mem_begin + 512){
-            mem = mem_begin;
-        }else{
-            mem += 1;
-        }
+        ++ i;
+        i %= 512;
     }
 
     return 0;

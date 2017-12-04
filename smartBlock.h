@@ -2,10 +2,10 @@
 #define SMART_BLOCK 
 
 #include "gen.h"
+#include <stdint.h>
 
 struct smart_block{
-    char gen_buff[GEN_BLOCK_SIZE];
-    char buff[GEN_BLOCK_SIZE];
+    volatile uint64_t gen[512];
 };
 
 #endif
