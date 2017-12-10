@@ -32,20 +32,22 @@ int main()
         perror("Can't mmap");
         return -1;
     }
-    struct smart_block* mem_begin = mem;
      
     uint32_t seed = 1;
     
-    int i = 0;
+    uint32_t i = 0;
     while(true)
     {   
         
         generate((void*)(mem->gen + i), seed);
         
         seed += 1; 
-        
+        //if (seed == 512){
+        //    seed = 0;
+        //}
+        printf("Seed: %d\n", seed);
         ++ i;
-        i %= 512;
+        i %= 127;
 
     }   
 

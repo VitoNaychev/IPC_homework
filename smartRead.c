@@ -23,27 +23,27 @@ int main()
         perror("Can't mmap");
         return -1;
     }   
-    struct smart_block* mem_begin = mem;
-    int i = 0; 
+    uint32_t i = 0; 
     uint32_t prev_seed = verify((void*)(mem->gen + i));
     ++ i;
-    while( true )
-    {
+    while(prev_seed == -1){
+        prev_seed = verify((void*)(mem->gen + i - 1));
+    }
+
+    while(true){
         uint32_t cur_seed = verify((void*)(mem->gen + i));
 
-        if(cur_seed == prev_seed + 1)
-        {
+        if(cur_seed - 1 == prev_seed){
+            printf("Prev: %d Curr: %d Next: %d\n", prev_seed, cur_seed, verify((void*)(mem->gen + i + 1)));
             prev_seed = cur_seed;
-            printf("Penis\n"); 
+            //printf("Penis\n"); 
         }else{
-            printf("Prev: %d Curr: %d\n", prev_seed, cur_seed);
-            usleep(1);
-            -- i;
-            i %= 512;
-            continue;              
+            printf("Prev: %d Curr: %d Next: %d\n", prev_seed, cur_seed, verify((void*)(mem->gen + i + 1)));
+            usleep(10);
+            prev_seed = cur_seed;
         }
         ++ i;
-        i %= 512;
+        i %= 127;
     }
 
     return 0;
