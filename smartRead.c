@@ -40,11 +40,24 @@ int main()
         }else{
             printf("Prev: %d Curr: %d\n", prev_seed, cur_seed);
             usleep(1);
-            //if(pos + 512 < mem->pos){
-            //    printf("U fucked up!\n");
-            //    printf("norm pos %d cur pos %d\n", pos, mem->pos);
-            //    return -1;
-            //}
+            if(pos + 2 * 512 < mem->pos){
+                printf("U fucked up! Do u want to continue? Y/n: ");
+                char cont = 'Y';
+                scanf("%c", &cont);
+                printf("\n");
+                if(cont == 'Y'){
+                    prev_seed = verify((void*)mem->gen);
+                    if((mem->pos + 1) % 512 == 0){ 
+                        mem -= 511;
+                    }else{
+                        mem += 1;
+                    }
+                    continue;
+                }else{
+                    return 0;
+                }
+                //printf("norm pos %d cur pos %d\n", pos, mem->pos);
+            }
             continue;
         }
         
