@@ -23,16 +23,15 @@ int main()
         perror("Can't mmap");
         return -1;
     }   
-    int i = 0; 
-    uint32_t prev_seed = verify((void*)((mem + i)->gen));
+    uint32_t prev_seed = verify((void*)(mem->gen));
 
     while(prev_seed == -1){
-        prev_seed = verify((void*)(mem + i)->gen);
+        prev_seed = verify((void*)(mem->gen));
     }
-    ++ i;
-
+    mem += 1;
     while(true){
-        uint32_t cur_seed = verify((void*)(mem + i)->gen);
+        
+        uint32_t cur_seed = verify((void*)mem->gen);
         uint64_t pos = mem->pos;
 
         if(cur_seed - 1 == prev_seed){
@@ -48,8 +47,14 @@ int main()
             //}
             continue;
         }
-        ++ i;
-        i %= 512;
+        
+        if((mem->pos + 1) % 512 == 0){ 
+            mem -= 511;
+        }else{
+            mem += 1;
+        }
+        
+
     }
 
     return 0;
