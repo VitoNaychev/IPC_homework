@@ -17,33 +17,39 @@ int main()
         return 1;
     }
 
-    struct smart_block* mem = mmap( NULL, sizeof(struct smart_block), PROT_READ, MAP_SHARED, memFd, 0 );
+    struct smart_block* mem = mmap( NULL, 512 * sizeof(struct smart_block), PROT_READ, MAP_SHARED, memFd, 0 );
     if( mem == NULL )
     {
         perror("Can't mmap");
         return -1;
     }   
-    uint32_t i = 0; 
-    uint32_t prev_seed = verify((void*)(mem->gen + i));
-    ++ i;
+    int i = 0; 
+    uint32_t prev_seed = verify((void*)((mem + i)->gen));
+
     while(prev_seed == -1){
-        prev_seed = verify((void*)(mem->gen + i - 1));
+        prev_seed = verify((void*)(mem + i)->gen);
     }
+    ++ i;
 
     while(true){
-        uint32_t cur_seed = verify((void*)(mem->gen + i));
+        uint32_t cur_seed = verify((void*)(mem + i)->gen);
+        uint64_t pos = mem->pos;
 
         if(cur_seed - 1 == prev_seed){
-            printf("Prev: %d Curr: %d Next: %d\n", prev_seed, cur_seed, verify((void*)(mem->gen + i + 1)));
+            printf("Prev: %d Curr: %d\n", prev_seed, cur_seed);
             prev_seed = cur_seed;
-            //printf("Penis\n"); 
         }else{
-            printf("Prev: %d Curr: %d Next: %d\n", prev_seed, cur_seed, verify((void*)(mem->gen + i + 1)));
-            usleep(10);
-            prev_seed = cur_seed;
+            printf("Prev: %d Curr: %d\n", prev_seed, cur_seed);
+            usleep(1);
+            //if(pos + 512 < mem->pos){
+            //    printf("U fucked up!\n");
+            //    printf("norm pos %d cur pos %d\n", pos, mem->pos);
+            //    return -1;
+            //}
+            continue;
         }
         ++ i;
-        i %= 127;
+        i %= 512;
     }
 
     return 0;

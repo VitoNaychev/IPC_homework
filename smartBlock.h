@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 struct smart_block{
+    uint64_t pos;
     volatile uint64_t gen[512];
 };
 
