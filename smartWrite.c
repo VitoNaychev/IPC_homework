@@ -20,7 +20,7 @@ int main()
     }
 
     int res;
-    res = ftruncate( memFd, 512 * sizeof(struct smart_block));
+    res = ftruncate( memFd, sizeof(struct smart_block));
     if( res == -1 )
     {
         perror("Can't truncate file");
