@@ -27,31 +27,24 @@ int main()
         return res;
     }   
    
-    struct smart_block* mem = mmap( NULL, 512 * sizeof(struct smart_block), PROT_READ | PROT_WRITE, MAP_SHARED, memFd, 0 );
+    struct smart_block* mem = mmap( NULL, sizeof(struct smart_block), PROT_READ | PROT_WRITE, MAP_SHARED, memFd, 0 );
     if( mem == NULL )
     {
         perror("Can't mmap");
         return -1;
     }
-
-    for(int i = 0 ; i < 512 ; ++ i){
-        (mem + i)->pos = i;
-    }
     
     uint32_t seed = 1;
-    
+    mem->pos = 0;
     while(true){   
         
-        if((mem->pos + 1) % 512 == 0){
-            mem -= 511;
-        }else{
-            mem += 1;
-        }
-        mem->pos += 512;
-        generate((void*)mem->gen, seed);
+        generate((void*)mem->gen[mem->pos % 512], seed);
         seed += 1; 
         
-        printf("Seed: %d Pos: %d\n", seed, mem->pos);
+        printf("Seed: %d Pos: %d\n", verify((void*)mem->gen[mem->pos % 512]), mem->pos);
+        
+        ++ mem->pos;
+        
     }   
 
     return 0;
