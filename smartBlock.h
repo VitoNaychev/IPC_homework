@@ -6,7 +6,7 @@
 
 struct smart_block{
     uint64_t pos;
-    volatile uint8_t gen[512][4096];
+    volatile uint8_t gen[512][4097];
 };
 
 #endif
