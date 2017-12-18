@@ -22,7 +22,9 @@ int main()
     {
         perror("Can't mmap");
         return -1;
-    }   
+    }
+
+    while(mem->pos < 512);
     uint64_t cur_pos = mem->pos - 100;
     
     uint32_t prev_seed = verify((void*)mem->gen[cur_pos % 512]);
@@ -35,7 +37,7 @@ int main()
         
         uint32_t cur_seed = verify((void*)mem->gen[cur_pos % 512]);
 
-        if(cur_seed - 1 == prev_seed){
+        if(cur_seed - 1 == prev_seed && cur_pos < mem->pos){
             printf("Prev: %d Curr: %d\n", prev_seed, cur_seed);
             prev_seed = cur_seed;
         }else{
@@ -44,7 +46,7 @@ int main()
             //proverqvame dali ne sme napravili neshto koeto
             //da e zabavilo reada i write da e izburzalo
             //s edin cikul napred(512 pozicii)
-            if(cur_pos  + 512 < mem->pos){
+            if(cur_pos  + 512 <= mem->pos){
                 printf("cur_pos: %d mem_pos: %d\n", cur_pos, mem->pos);
                 printf("Seems like write is faster than SaNiC... Do you want to continue 1 == Yes/0 == No: ");
                 uint8_t ans = 0;
